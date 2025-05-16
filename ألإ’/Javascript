@@ -1,0 +1,176 @@
+let patients = [];
+let currentId = 1;
+let currentEditId = null;
+
+// Initialize the app
+function init() {
+    updateCount();
+    const savedData = localStorage.getItem('patients');
+    if(savedData) {
+        patients = JSON.parse(savedData);
+        currentId = patients.length > 0 ? Math.max(...patients.map(p => p.id)) + 1 : 1;
+        renderTable();
+    }
+}
+
+// Handle both add and update
+function handleAddUpdate() {
+    if (currentEditId !== null) {
+        updatePatient();
+    } else {
+        addPatient();
+    }
+}
+
+// Add new patient
+function addPatient() {
+    if (!validateInputs()) {
+        alert('Please fill all required fields');
+        return;
+    }
+
+    const patient = {
+        id: currentId++,
+        name: document.getElementById('patient-name').value.trim(),
+        fee: document.getElementById('admission-fee').value,
+        insurance: document.getElementById('insurance').value,
+        medications: document.getElementById('medications').value.split(',').map(m => m.trim()),
+        discount: document.getElementById('discount').value,
+        department: document.getElementById('department').value,
+        total: calculateTotal()
+    };
+    
+    patients.push(patient);
+    saveData();
+    clearForm();
+    renderTable();
+}
+
+// Edit patient
+function editPatient(id) {
+    currentEditId = id;
+    const patient = patients.find(p => p.id === id);
+    
+    document.getElementById('patient-name').value = patient.name;
+    document.getElementById('admission-fee').value = patient.fee;
+    document.getElementById('insurance').value = patient.insurance;
+    document.getElementById('medications').value = patient.medications.join(', ');
+    document.getElementById('discount').value = patient.discount;
+    document.getElementById('department').value = patient.department;
+    
+    document.getElementById('add-btn').textContent = 'Update Patient';
+    document.getElementById('cancel-btn').style.display = 'inline-block';
+}
+
+// Update patient
+function updatePatient() {
+    if (!validateInputs()) {
+        alert('Please fill all required fields');
+        return;
+    }
+
+    const index = patients.findIndex(p => p.id === currentEditId);
+    const total = calculateTotal();
+    
+    patients[index] = {
+        id: currentEditId,
+        name: document.getElementById('patient-name').value.trim(),
+        fee: document.getElementById('admission-fee').value,
+        insurance: document.getElementById('insurance').value,
+        medications: document.getElementById('medications').value.split(',').map(m => m.trim()),
+        discount: document.getElementById('discount').value,
+        department: document.getElementById('department').value,
+        total: total
+    };
+
+    saveData();
+    cancelEdit();
+    renderTable();
+}
+
+// Cancel edit
+function cancelEdit() {
+    currentEditId = null;
+    clearForm();
+    document.getElementById('add-btn').textContent = 'Add Patient';
+    document.getElementById('cancel-btn').style.display = 'none';
+}
+
+// Delete patient
+function deletePatient(id) {
+    patients = patients.filter(patient => patient.id !== id);
+    saveData();
+    renderTable();
+}
+
+// Delete all patients
+function deleteAll() {
+    if(confirm('Are you sure you want to delete all patients?')) {
+        patients = [];
+        currentId = 1;
+        saveData();
+        renderTable();
+    }
+}
+
+// Validate inputs
+function validateInputs() {
+    return document.getElementById('patient-name').value.trim() !== '' &&
+           document.getElementById('department').value !== '' &&
+           document.getElementById('admission-fee').value !== '';
+}
+
+// Calculate total
+function calculateTotal() {
+    const fee = parseFloat(document.getElementById('admission-fee').value) || 0;
+    const insurance = parseFloat(document.getElementById('insurance').value) || 0;
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    return fee + insurance - discount;
+}
+
+// Clear form
+function clearForm() {
+    document.getElementById('patient-name').value = '';
+    document.getElementById('admission-fee').value = '';
+    document.getElementById('insurance').value = '';
+    document.getElementById('medications').value = '';
+    document.getElementById('discount').value = '';
+    document.getElementById('department').value = '';
+}
+
+// Render table
+function renderTable() {
+    const tbody = document.getElementById('patients-table');
+    tbody.innerHTML = patients.map(patient => `
+        <tr>
+            <td>${patient.id}</td>
+            <td>${patient.name}</td>
+            <td>$${patient.fee}</td>
+            <td>$${patient.insurance}</td>
+            <td>${patient.medications.join(', ')}</td>
+            <td>$${patient.discount}</td>
+            <td>$${patient.total}</td>
+            <td>${patient.department}</td>
+            <td>
+                <button class="btn" onclick="editPatient(${patient.id})">Edit</button>
+                <button class="btn danger" onclick="deletePatient(${patient.id})">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+    
+    updateCount();
+}
+
+// Update patient count
+function updateCount() {
+    document.getElementById('count').textContent = patients.length;
+}
+
+// Save to localStorage
+function saveData() {
+    localStorage.setItem('patients', JSON.stringify(patients));
+    updateCount();
+}
+
+// Initialize app
+init();
