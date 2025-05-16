@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hospital Patient Management</title>
+    <link rel="stylesheet" href="web pro.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Hospital Patient Management System</h1>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="patient-name" placeholder="Patient Name">
+        <input type="number" id="admission-fee" placeholder="Admission Fee">
+        <input type="number" id="insurance" placeholder="Insurance Coverage">
+        <input type="text" id="medications" placeholder="Medications (comma separated)">
+        <input type="number" id="discount" placeholder="Insurance Discount">
+        <select id="department">
+            <option value="">Select Department</option>
+            <option>Cardiology</option>
+            <option>Pediatrics</option>
+            <option>Emergency</option>
+            <option>Orthopedics</option>
+        </select>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="add-btn" onclick="handleAddUpdate()">Add Patient</button>
+        <button class="btn danger" onclick="cancelEdit()" style="display: none;" id="cancel-btn">Cancel</button>
+    </div>
+
+    <div class="search-section">
+        <input type="text" placeholder="Search by Name" id="search-name">
+        <select id="search-department">
+            <option value="">All Departments</option>
+            <option>Cardiology</option>
+            <option>Pediatrics</option>
+            <option>Emergency</option>
+            <option>Orthopedics</option>
+        </select>
+        <button class="btn danger" onclick="deleteAll()">Delete All (<span id="count">0</span>)</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Admission Fee</th>
+                <th>Insurance</th>
+                <th>Medications</th>
+                <th>Discount</th>
+                <th>Total</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="patients-table">
+            <!-- Patient data will be inserted here -->
+        </tbody>
+    </table>
+
+    <script src="web pro.js"></script>
+</body>
+</html>
